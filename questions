@@ -1,0 +1,46 @@
+- comment intégrer la récupération de données en base dans la page ?
+  - prendre l’exercice d’intégration, renommer les fichiers en .php, rajouter du
+    code PHP à l’intérieur, puis itérer sur la liste d’articles pour générer le
+    HTML voulu
+    - comment récupérer les infos qui nous intéressent ?
+      - requête SQL via PHP
+        - de quelle forme ?
+          - SELECT id, titre, auteur, date, extrait, image FROM news ORDER BY date DESC LIMIT 3
+          - comment amener le visiteur vers la news complète ?
+            - un lien du type news.php?id=[id]
+    - où placer les bonnes infos dans les bonnes balises ?
+      - les noms de champs sont explicites
+    - comment fromager la date ?
+      - on récupère une chaîne de caractères de la base (format « YYYY/MM/DD
+        hh:mm:ss »), on crée un objet Datetime avec, et on utilise format() pour
+      choisir le bon format.
+- comment structurer les fichiers ?
+  - fichier de config contenant le mot de passe mysql (et autres infos), nombre
+    de news à afficher sur l’accueil
+  - fichier de fonctions contenant :
+    - une fonction récupérant la liste des dernières news,
+    - une fonction créant un objet PDO
+  - fichier init.php contenant le code commun nécessaire pour toutes les pages
+  (connexion à la BDD)
+- où déclarer notre connexion à la base de données ?
+  - une fonction renvoyant un objet PDO, appelée au début de chaque page, et
+    ensuite utilisée comme globale dans les autres fonctions.
+
+
+/**
+ * Récupère les dernières news du site
+ * @param int $count le nombre de news à récupérer
+ * @return PDOStatement la liste des news, contenant les colonnes id, titre,
+ * image, auteur, extrait, date
+ */
+function get_last_news($count) {
+    global $db;
+    $liste_articles = $db->query('SELECT id, titre, image, auteur, extrait, date FROM news ORDER BY date DESC LIMIT '.$count);
+    return $liste_articles;
+}
+
+$articles = get_last_news(3);
+
+foreach($articles as $art) {
+    echo '<div class="article">'.$art['extrait'].'</div>';
+}
